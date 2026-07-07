@@ -1,0 +1,125 @@
+@import "tailwindcss";
+
+@theme {
+  /* SQA brand system — derived from the actual logo ultramarine */
+  --color-primary: #2003bd;
+  --color-primary-deep: #16027f;
+  --color-primary-bright: #3d27e8;
+  --color-ink: #10153a;
+  --color-ink-soft: #4a5072;
+  --color-band: #f2f4fb;
+  --color-band-deep: #e8ecf8;
+  --color-line: #dfe3f0;
+  --color-paper: #ffffff;
+
+  --font-sans: var(--font-golos), system-ui, sans-serif;
+
+  --radius-card: 8px;
+
+  --shadow-card: 0 1px 2px rgb(16 21 58 / 0.06), 0 4px 12px rgb(16 21 58 / 0.06);
+  --shadow-card-hover: 0 2px 4px rgb(32 3 189 / 0.08), 0 12px 28px rgb(32 3 189 / 0.14);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- typography helpers ---------- */
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+/* ---------- guilloche accreditation ribbon ---------- */
+.guilloche {
+  background-color: var(--color-primary-deep);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='24' viewBox='0 0 120 24'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.13' stroke-width='1'%3E%3Cpath d='M0 12c10-10 20-10 30 0s20 10 30 0 20-10 30 0 20 10 30 0'/%3E%3Cpath d='M0 12c10 10 20 10 30 0s20-10 30 0 20 10 30 0 20-10 30 0'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 120px 24px;
+}
+
+/* ---------- partner marquee (dual rows, opposite directions) ---------- */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 3rem;
+  padding-block: 0.75rem;
+}
+.marquee-track--left { animation: marquee-left 36s linear infinite; }
+.marquee-track--right { animation: marquee-right 36s linear infinite; }
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track--left,
+  .marquee-track--right {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .marquee { mask-image: none; -webkit-mask-image: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- scroll reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- cards ---------- */
+.card {
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-card-hover);
+  border-color: color-mix(in srgb, var(--color-primary) 35%, var(--color-line));
+  transform: translateY(-3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card, .card-hover:hover { transform: none; transition: none; }
+}
+
+/* ---------- focus ---------- */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ---------- prose-lite for article bodies ---------- */
+.article-body p { margin-bottom: 1rem; line-height: 1.75; color: var(--color-ink-soft); }
