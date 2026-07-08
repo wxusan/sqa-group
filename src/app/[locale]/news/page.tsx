@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { guardPage } from "@/lib/pageSettings";
 import { prisma } from "@/lib/prisma";
 import NewsCard from "@/components/public/NewsCard";
 import Reveal from "@/components/public/Reveal";
@@ -14,6 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function NewsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("news");
   const t = await getTranslations("news");
   const tc = await getTranslations("common");
 

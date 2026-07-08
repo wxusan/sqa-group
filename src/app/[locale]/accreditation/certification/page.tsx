@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { guardPage } from "@/lib/pageSettings";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Reveal from "@/components/public/Reveal";
 
@@ -11,12 +12,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function AccredCertPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("accreditation-certification");
   const t = await getTranslations("accreditation");
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 py-14">
       <Reveal>
-        <p className="eyebrow mb-2">O&apos;ZAK.MS.0052 · O&apos;z DSt ISO/IEC 17065:2015</p>
+        <p className="eyebrow mb-2">O&apos;ZAKK.MS.0052 · O&apos;z DSt ISO/IEC 17065:2015</p>
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{t("certTitle")}</h1>
         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-ink-soft">{t("certIntro")}</p>
       </Reveal>
@@ -41,7 +43,7 @@ export default async function AccredCertPage({ params }: { params: Promise<{ loc
         </Reveal>
         <Reveal delay={100}>
           <figure className="card overflow-hidden">
-            <Image src="/images/certificates/certification-body.jpeg" alt="O'ZAK.MS.0052" width={500} height={690} className="w-full object-contain" />
+            <Image src="/images/certificates/certification-body.jpeg" alt="O'ZAKK.MS.0052" width={500} height={690} className="w-full object-contain" />
           </figure>
         </Reveal>
       </div>

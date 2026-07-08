@@ -1,6 +1,8 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { guardPage } from "@/lib/pageSettings";
 import Reveal from "@/components/public/Reveal";
 import CopyTemplate from "@/components/public/CopyTemplate";
+import DocDownload from "@/components/public/DocDownload";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -11,6 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function AppealsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("appeals");
   const t = await getTranslations("appeals");
 
   return (
@@ -45,8 +48,9 @@ export default async function AppealsPage({ params }: { params: Promise<{ locale
             <pre className="mt-4 overflow-x-auto whitespace-pre-wrap rounded-card border border-line bg-band p-5 font-sans text-sm leading-relaxed text-ink">
               {t("templateBody")}
             </pre>
-            <div className="mt-4">
+            <div className="mt-4 flex flex-wrap items-center gap-3">
               <CopyTemplate text={t("templateBody")} copyLabel={t("copyTemplate")} copiedLabel={t("copied")} />
+              <DocDownload href="/documents/complaints-and-appeals.docx" label={t("downloadWord")} />
             </div>
           </section>
         </Reveal>

@@ -9,14 +9,16 @@ function Row({ partners, direction }: { partners: PartnerItem[]; direction: "lef
     <div className="marquee">
       <div className={`marquee-track marquee-track--${direction}`}>
         {track.map((p, i) => {
-          const logo = (
-            <Image
-              src={p.logoUrl}
-              alt={p.name}
-              width={140}
-              height={64}
-              className="h-14 w-auto object-contain opacity-70 grayscale transition-all duration-300 hover:opacity-100 hover:grayscale-0"
-            />
+          const tile = (
+            <div className="flex h-24 w-44 items-center justify-center rounded-2xl border border-line bg-white px-7 shadow-[0_1px_3px_rgba(16,21,58,0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_10px_28px_rgba(16,21,58,0.12)]">
+              <Image
+                src={p.logoUrl}
+                alt={p.name}
+                width={176}
+                height={88}
+                className="max-h-12 w-auto max-w-full object-contain"
+              />
+            </div>
           );
           return p.websiteUrl ? (
             <a
@@ -28,11 +30,11 @@ function Row({ partners, direction }: { partners: PartnerItem[]; direction: "lef
               tabIndex={i >= partners.length ? -1 : 0}
               className="flex items-center"
             >
-              {logo}
+              {tile}
             </a>
           ) : (
             <div key={`${p.id}-${i}`} className="flex items-center" aria-label={p.name}>
-              {logo}
+              {tile}
             </div>
           );
         })}

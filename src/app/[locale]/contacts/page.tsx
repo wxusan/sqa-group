@@ -1,6 +1,7 @@
-import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { guardPage } from "@/lib/pageSettings";
 import Reveal from "@/components/public/Reveal";
+import { OFFICE } from "@/lib/site";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -11,6 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function ContactsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("contacts");
   const t = await getTranslations("contacts");
 
   return (
@@ -56,14 +58,26 @@ export default async function ContactsPage({ params }: { params: Promise<{ local
         </div>
 
         <Reveal delay={120}>
-          <a
-            href="https://maps.google.com/?q=Tashkent+Chilanzar+Kamolon+Zarkand+street+11"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="card block overflow-hidden"
-          >
-            <Image src="/images/office/office.jpg" alt={t("addressTitle")} width={640} height={480} className="h-full max-h-[420px] w-full object-cover transition-transform duration-300 hover:scale-[1.02]" />
-          </a>
+          <div className="card overflow-hidden">
+            <iframe
+              title={t("addressTitle")}
+              src={OFFICE.embedSrc}
+              width="100%"
+              height="440"
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              allowFullScreen
+              className="block h-[440px] w-full border-0"
+            />
+            <a
+              href={OFFICE.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block border-t border-line px-4 py-3 text-center text-sm font-semibold text-primary hover:underline"
+            >
+              {t("openInMaps")} →
+            </a>
+          </div>
         </Reveal>
       </div>
     </div>

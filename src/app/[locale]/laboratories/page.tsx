@@ -1,6 +1,7 @@
-import Image from "next/image";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { guardPage } from "@/lib/pageSettings";
 import Reveal from "@/components/public/Reveal";
+import { CertificateCard } from "@/components/public/DocDownload";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -11,6 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function LaboratoriesPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("laboratories");
   const t = await getTranslations("laboratories");
 
   return (
@@ -38,10 +40,10 @@ export default async function LaboratoriesPage({ params }: { params: Promise<{ l
         ))}
       </div>
 
-      <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_1fr]">
+      <div className="mt-12">
         <Reveal>
           <h2 className="text-xl font-bold">{t("equipmentTitle")}</h2>
-          <ul className="mt-5 space-y-3">
+          <ul className="mt-5 grid gap-3 sm:grid-cols-2">
             {(["eq1", "eq2", "eq3", "eq4"] as const).map((k) => (
               <li key={k} className="flex items-start gap-3 text-sm font-medium text-ink">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true" className="mt-0.5 shrink-0 text-primary">
@@ -53,10 +55,24 @@ export default async function LaboratoriesPage({ params }: { params: Promise<{ l
             ))}
           </ul>
         </Reveal>
-        <Reveal delay={100}>
-          <figure className="card overflow-hidden">
-            <Image src="/images/certificates/testing-laboratory.jpeg" alt="O'ZAK.SL.0162" width={500} height={690} className="w-full object-contain" />
-          </figure>
+      </div>
+
+      <div className="mt-12 grid max-w-3xl gap-5 sm:grid-cols-2">
+        <Reveal>
+          <CertificateCard
+            img="/images/certificates/testing-laboratory.jpeg"
+            caption="O'ZAKK.SL.0162"
+            href="/documents/sqa-laboratory-certificate.pdf"
+            downloadLabel={t("downloadCert")}
+          />
+        </Reveal>
+        <Reveal delay={80}>
+          <CertificateCard
+            img="/images/certificates/s-lab-certificate.jpeg"
+            caption="O'ZAKK.SL.0437"
+            href="/documents/sqa-s-lab-certificate.pdf"
+            downloadLabel={t("downloadCert")}
+          />
         </Reveal>
       </div>
     </div>

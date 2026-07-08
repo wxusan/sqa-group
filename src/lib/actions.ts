@@ -8,6 +8,7 @@ import { storeImage, deleteLocalUpload } from "@/lib/storage";
 import { missingTranslations } from "@/lib/publish";
 import { slugify } from "@/lib/slug";
 import { locales } from "@/i18n/routing";
+import { PAGE_KEYS } from "@/lib/pages";
 
 async function requireAdmin() {
   const session = await auth();
@@ -274,4 +275,20 @@ export async function deleteMedia(formData: FormData) {
   const name = String(formData.get("name") ?? "");
   if (name) await deleteLocalUpload(name);
   revalidatePath("/admin/media");
+}
+
+/* ---------------- page visibility ---------------- */
+
+export async function setPageEnabled(formData: FormData) {
+  await requireAdmin();
+  const key = String(formData.get("key") ?? "");
+  const enabled = String(formData.get("enabled") ?? "") === "true";
+  if (!key || !PAGE_KEYS.has(key)) return;
+  await prisma.pageSetting.upsert({
+    where: { key },
+    update: { enabled },
+    create: { key, enabled },
+  });
+  revalidatePublic();
+  revalidatePath("/admin/pages");
 }

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { OFFICE } from "@/lib/site";
 
 const NAV = [
   { href: "/about", key: "about" },
@@ -13,14 +14,12 @@ const NAV = [
   { href: "/contacts", key: "contacts" },
 ] as const;
 
-export default function Footer() {
+export default function Footer({ hiddenHrefs = [] }: { hiddenHrefs?: string[] }) {
+  const hidden = new Set(hiddenHrefs);
   const t = useTranslations("footer");
   const tn = useTranslations("nav");
   const tc = useTranslations("contacts");
   const year = new Date().getFullYear();
-  const mapQuery = encodeURIComponent(
-    "Toshkent Chilonzor Kamolon MFY 3-Charx Zarqand ko'chasi 1-berk ko'cha 11"
-  );
 
   return (
     <footer className="border-t border-line bg-band">
@@ -51,7 +50,7 @@ export default function Footer() {
         <div>
           <h3 className="text-sm font-bold uppercase tracking-wide text-ink">{t("navTitle")}</h3>
           <ul className="mt-4 space-y-2.5">
-            {NAV.map((item) => (
+            {NAV.filter((item) => !hidden.has(item.href)).map((item) => (
               <li key={item.href}>
                 <Link href={item.href} className="text-sm text-ink-soft transition-colors hover:text-primary">
                   {tn(item.key)}
@@ -89,12 +88,18 @@ export default function Footer() {
           <div className="relative mt-3 h-36 overflow-hidden rounded-card border border-line bg-white shadow-card">
             <iframe
               title={t("officeTitle")}
-              src={`https://www.google.com/maps?q=${mapQuery}&z=15&output=embed`}
+              src={OFFICE.embedSrc}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="absolute -inset-3 h-[calc(100%+24px)] w-[calc(100%+24px)] border-0 grayscale-[0.15]"
+              className="absolute inset-0 h-full w-full border-0"
             />
-            <div aria-hidden="true" className="pointer-events-none absolute left-0 top-0 h-10 w-24 bg-band" />
+            <a
+              href={OFFICE.mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t("officeTitle")}
+              className="absolute inset-0"
+            />
           </div>
         </div>
       </div>
@@ -102,7 +107,7 @@ export default function Footer() {
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-2 px-4 py-4 text-xs text-ink-soft">
           <span>© {year} Standart and Quality Assessment Group. {t("rights")}</span>
-          <span>O&#39;ZAK.MS.0052 · O&#39;ZAK.SL.0162</span>
+          <span>O&#39;ZAKK.MS.0052 · O&#39;ZAKK.SL.0162</span>
         </div>
       </div>
     </footer>

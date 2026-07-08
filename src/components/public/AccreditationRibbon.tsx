@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 /**
  * Signature element: certificate-edge strip with a guilloche pattern
  * (the security-paper language of SQA's own accreditation certificates),
- * carrying the real O'ZAK registry data.
+ * carrying the real O'ZAKK registry data.
  */
 export default function AccreditationRibbon() {
   const t = useTranslations("home");
@@ -11,13 +11,13 @@ export default function AccreditationRibbon() {
   const items = [
     {
       label: t("ribbonCertBody"),
-      number: "O'ZAK.MS.0052",
+      number: "O'ZAKK.MS.0052",
       standard: "O'z DSt ISO/IEC 17065:2015",
       valid: "11.01.2027",
     },
     {
       label: t("ribbonLab"),
-      number: "O'ZAK.SL.0162",
+      number: "O'ZAKK.SL.0162",
       standard: "O'z DSt ISO/IEC 17025:2019",
       valid: "10.01.2027",
     },

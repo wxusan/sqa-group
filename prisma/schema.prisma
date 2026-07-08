@@ -86,3 +86,11 @@ model AdminUser {
   passwordHash String
   name         String?
 }
+
+/* Per-page visibility toggle controlled from the admin panel.
+   A missing row means the page is enabled (default on). */
+model PageSetting {
+  key       String   @id
+  enabled   Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}

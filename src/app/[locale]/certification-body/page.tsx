@@ -1,6 +1,8 @@
 import Image from "next/image";
+import { guardPage } from "@/lib/pageSettings";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Reveal from "@/components/public/Reveal";
+import DocDownload from "@/components/public/DocDownload";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -11,12 +13,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function CertificationBodyPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("certification-body");
   const t = await getTranslations("certificationBody");
 
   return (
     <div className="mx-auto max-w-[1200px] px-4 py-14">
       <Reveal>
-        <p className="eyebrow mb-2">O&#39;ZAK.MS.0052 · O&#39;z DSt ISO/IEC 17065:2015</p>
+        <p className="eyebrow mb-2">O&#39;ZAKK.MS.0052 · O&#39;z DSt ISO/IEC 17065:2015</p>
         <h1 className="text-3xl font-black tracking-tight sm:text-4xl">{t("title")}</h1>
         <p className="mt-4 max-w-3xl text-lg leading-relaxed text-ink-soft">{t("intro")}</p>
       </Reveal>
@@ -27,6 +30,16 @@ export default async function CertificationBodyPage({ params }: { params: Promis
             <section className="card p-7">
               <h2 className="text-xl font-bold">{t("scopeTitle")}</h2>
               <p className="mt-3 leading-relaxed text-ink-soft">{t("scopeText")}</p>
+              <div className="mt-5 overflow-hidden rounded-card border border-line bg-band">
+                <iframe
+                  src="/documents/sqa-idora.pdf#view=FitH"
+                  title={t("scopeTitle")}
+                  className="h-[68vh] max-h-[760px] min-h-[440px] w-full"
+                />
+              </div>
+              <div className="mt-3">
+                <DocDownload href="/documents/sqa-idora.pdf" label={t("downloadScope")} />
+              </div>
             </section>
           </Reveal>
           <Reveal>
@@ -53,7 +66,7 @@ export default async function CertificationBodyPage({ params }: { params: Promis
         </div>
         <Reveal delay={100}>
           <figure className="card sticky top-24 overflow-hidden">
-            <Image src="/images/certificates/certification-body.jpeg" alt="O'ZAK.MS.0052" width={500} height={690} className="w-full object-contain" />
+            <Image src="/images/certificates/certification-body.jpeg" alt="O'ZAKK.MS.0052" width={500} height={690} className="w-full object-contain" />
           </figure>
         </Reveal>
       </div>

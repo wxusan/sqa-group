@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { guardPage } from "@/lib/pageSettings";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -21,6 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function NewsDetailPage({ params }: { params: Promise<{ locale: string; slug: string }> }) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
+  await guardPage("news");
   const t = await getTranslations("news");
   const tc = await getTranslations("common");
 

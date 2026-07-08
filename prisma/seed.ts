@@ -69,10 +69,20 @@ const STAFF: { slug: string; name: string; pos: PosKey; dept: "certification" | 
 ];
 
 const PARTNERS = [
-  { name: "Art Mebel", logo: "/images/partners/art-mebel.png", order: 1 },
-  { name: "Korzinka", logo: "/images/partners/korzinka.jpg", order: 2 },
-  { name: "O'zTTM", logo: "/images/partners/ozttm.png", order: 3 },
-  { name: "Discover", logo: "/images/partners/discover.jpg", order: 4 },
+  { name: "Coca-Cola", logo: "/images/partners/coca-cola.png", order: 1 },
+  { name: "KFC", logo: "/images/partners/kfc.png", order: 2 },
+  { name: "Korzinka", logo: "/images/partners/korzinka.png", order: 3 },
+  { name: "Costa Coffee", logo: "/images/partners/costa-coffee.png", order: 4 },
+  { name: "Askona", logo: "/images/partners/askona.png", order: 5 },
+  { name: "Medion", logo: "/images/partners/medion.png", order: 6 },
+  { name: "Joma", logo: "/images/partners/joma.png", order: 7 },
+  { name: "Discover Invest", logo: "/images/partners/discover-invest.jpg", order: 8 },
+  { name: "Bloomshop", logo: "/images/partners/bloomshop.png", order: 9 },
+  { name: "7Fitness", logo: "/images/partners/seven-fitness.png", order: 10 },
+  { name: "Saber 7", logo: "/images/partners/saber-7.png", order: 11 },
+  { name: "KOC Construction", logo: "/images/partners/koc-construction.png", order: 12 },
+  { name: "Uzbekistan Football Association", logo: "/images/partners/uzbekistan-football.png", order: 13 },
+  { name: "Uzbekiston Voleybol Federatsiyasi", logo: "/images/partners/uzbekistan-volleyball.jpeg", order: 14 },
 ];
 
 const NEWS = [
@@ -82,18 +92,18 @@ const NEWS = [
     image: "/images/certificates/certification-body.jpeg",
     uz: {
       title: "Akkreditatsiya guvohnomalarimiz 2027 yilgacha amal qiladi",
-      summary: "Sertifikatlash organi va sinov laboratoriyasi O'ZAK guvohnomalari yangilangan muddatlar bilan amalda.",
-      body: "\"Standart and Quality Assessment Group\" MChJ sertifikatlash organi O'ZAK.MS.0052 raqamli guvohnoma asosida O'z DSt ISO/IEC 17065:2015 standarti bo'yicha akkreditatsiyalangan. Guvohnoma 2027 yil 11 yanvargacha amal qiladi.\nSinov laboratoriyamiz esa O'ZAK.SL.0162 raqamli guvohnoma asosida O'z DSt ISO/IEC 17025:2019 standarti bo'yicha akkreditatsiyalangan bo'lib, guvohnoma 2027 yil 10 yanvargacha amal qiladi.\nAkkreditatsiya holatini O'zbekiston akkreditatsiya markazining rasmiy sayti akkred.uz orqali tekshirishingiz mumkin.",
+      summary: "Sertifikatlash organi va sinov laboratoriyasi O'ZAKK guvohnomalari yangilangan muddatlar bilan amalda.",
+      body: "\"Standart and Quality Assessment Group\" MChJ sertifikatlash organi O'ZAKK.MS.0052 raqamli guvohnoma asosida O'z DSt ISO/IEC 17065:2015 standarti bo'yicha akkreditatsiyalangan. Guvohnoma 2027 yil 11 yanvargacha amal qiladi.\nSinov laboratoriyamiz esa O'ZAKK.SL.0162 raqamli guvohnoma asosida O'z DSt ISO/IEC 17025:2019 standarti bo'yicha akkreditatsiyalangan bo'lib, guvohnoma 2027 yil 10 yanvargacha amal qiladi.\nAkkreditatsiya holatini O'zbekiston akkreditatsiya markazining rasmiy sayti akkred.uz orqali tekshirishingiz mumkin.",
     },
     ru: {
       title: "Наши аттестаты аккредитации действуют до 2027 года",
-      summary: "Аттестаты O'ZAK органа по сертификации и испытательной лаборатории действительны.",
-      body: "Орган по сертификации ООО «Standart and Quality Assessment Group» аккредитован по стандарту O'z DSt ISO/IEC 17065:2015 на основании аттестата O'ZAK.MS.0052. Аттестат действует до 11 января 2027 года.\nИспытательная лаборатория аккредитована по стандарту O'z DSt ISO/IEC 17025:2019 на основании аттестата O'ZAK.SL.0162, который действует до 10 января 2027 года.\nСтатус аккредитации можно проверить на официальном сайте Центра аккредитации Узбекистана akkred.uz.",
+      summary: "Аттестаты O'ZAKK органа по сертификации и испытательной лаборатории действительны.",
+      body: "Орган по сертификации ООО «Standart and Quality Assessment Group» аккредитован по стандарту O'z DSt ISO/IEC 17065:2015 на основании аттестата O'ZAKK.MS.0052. Аттестат действует до 11 января 2027 года.\nИспытательная лаборатория аккредитована по стандарту O'z DSt ISO/IEC 17025:2019 на основании аттестата O'ZAKK.SL.0162, который действует до 10 января 2027 года.\nСтатус аккредитации можно проверить на официальном сайте Центра аккредитации Узбекистана akkred.uz.",
     },
     en: {
       title: "Our accreditation certificates are valid until 2027",
-      summary: "O'ZAK certificates of the certification body and the testing laboratory remain in force.",
-      body: "The certification body of Standart and Quality Assessment Group LLC is accredited to O'z DSt ISO/IEC 17065:2015 under certificate O'ZAK.MS.0052, valid until 11 January 2027.\nOur testing laboratory is accredited to O'z DSt ISO/IEC 17025:2019 under certificate O'ZAK.SL.0162, valid until 10 January 2027.\nAccreditation status can be verified on the official website of the Uzbek Accreditation Centre, akkred.uz.",
+      summary: "O'ZAKK certificates of the certification body and the testing laboratory remain in force.",
+      body: "The certification body of Standart and Quality Assessment Group LLC is accredited to O'z DSt ISO/IEC 17065:2015 under certificate O'ZAKK.MS.0052, valid until 11 January 2027.\nOur testing laboratory is accredited to O'z DSt ISO/IEC 17025:2019 under certificate O'ZAKK.SL.0162, valid until 10 January 2027.\nAccreditation status can be verified on the official website of the Uzbek Accreditation Centre, akkred.uz.",
     },
   },
   {
@@ -172,23 +182,19 @@ async function main() {
     });
   }
 
-  /* partners */
+  /* partners — authoritative: mirror the PARTNERS list exactly */
+  await prisma.partner.deleteMany();
   for (const p of PARTNERS) {
-    const existing = await prisma.partner.findFirst({
-      where: { translations: { some: { name: p.name } } },
-    });
-    if (!existing) {
-      await prisma.partner.create({
-        data: {
-          logoUrl: p.logo,
-          order: p.order,
-          published: true,
-          translations: {
-            create: (["uz", "ru", "en"] as const).map((locale) => ({ locale, name: p.name })),
-          },
+    await prisma.partner.create({
+      data: {
+        logoUrl: p.logo,
+        order: p.order,
+        published: true,
+        translations: {
+          create: (["uz", "ru", "en"] as const).map((locale) => ({ locale, name: p.name })),
         },
-      });
-    }
+      },
+    });
   }
 
   /* news */

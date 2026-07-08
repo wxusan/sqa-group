@@ -1,4 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { guardPage } from "@/lib/pageSettings";
 import Reveal from "@/components/public/Reveal";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
@@ -10,6 +11,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function FinancingPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("financing");
   const t = await getTranslations("financing");
 
   return (

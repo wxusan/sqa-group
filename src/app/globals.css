@@ -64,7 +64,7 @@ body {
 .marquee-track {
   display: flex;
   width: max-content;
-  gap: 3rem;
+  gap: 1.25rem;
   padding-block: 0.75rem;
 }
 .marquee-track--left { animation: marquee-left 36s linear infinite; }

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { guardPage } from "@/lib/pageSettings";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Reveal from "@/components/public/Reveal";
 
@@ -11,6 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
+  await guardPage("about");
   const t = await getTranslations("about");
 
   return (

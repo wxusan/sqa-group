@@ -76,7 +76,7 @@ export default async function HomePage({
               </Link>
               <Link
                 href="/laboratories"
-                className="rounded-card border border-line bg-white px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-primary hover:text-primary"
+                className="rounded-card bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-bright"
               >
                 {t("heroCtaLab")}
               </Link>
@@ -107,7 +107,7 @@ export default async function HomePage({
           {[
             { href: "/certification-body", title: t("certBodyCardTitle"), text: t("certBodyCardText"), badge: "ISO/IEC 17065" },
             { href: "/laboratories", title: t("lab1CardTitle"), text: t("lab1CardText"), badge: "ISO/IEC 17025" },
-            { href: "/laboratories", title: t("lab2CardTitle"), text: t("lab2CardText"), badge: "SQA Group" },
+            { href: "/laboratories", title: t("lab2CardTitle"), text: t("lab2CardText"), badge: "O'ZAKK.SL.0437" },
           ].map((c, i) => (
             <Reveal key={i} delay={i * 80}>
               <Link href={c.href} className="card card-hover group block h-full p-6">
@@ -131,9 +131,9 @@ export default async function HomePage({
           </Reveal>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {[
-              { src: "/images/certificates/certification-body.jpeg", caption: "O'ZAK.MS.0052" },
-              { src: "/images/certificates/testing-laboratory.jpeg", caption: "O'ZAK.SL.0162" },
-              { src: "/images/logo/logo-black.jpg", caption: "SQA Group" },
+              { src: "/images/certificates/certification-body.jpeg", caption: "O'ZAKK.MS.0052" },
+              { src: "/images/certificates/testing-laboratory.jpeg", caption: "O'ZAKK.SL.0162" },
+              { src: "/images/certificates/s-lab-certificate.jpeg", caption: "O'ZAKK.SL.0437" },
             ].map((c, i) => (
               <Reveal key={c.caption} delay={i * 80}>
                 <figure className="card overflow-hidden">

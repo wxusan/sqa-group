@@ -23,12 +23,16 @@ const MORE = [
   { href: "/appeals", key: "appeals" },
 ] as const;
 
-export default function Header() {
+export default function Header({ hiddenHrefs = [] }: { hiddenHrefs?: string[] }) {
   const t = useTranslations("nav");
   const tc = useTranslations("common");
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
+
+  const hidden = new Set(hiddenHrefs);
+  const nav = NAV.filter((i) => !hidden.has(i.href));
+  const more = MORE.filter((i) => !hidden.has(i.href));
 
   const linkCls = (href: string) =>
     `text-sm font-medium transition-colors hover:text-primary ${
@@ -48,11 +52,12 @@ export default function Header() {
         </Link>
 
         <nav className="hidden items-center gap-6 lg:flex" aria-label="Main">
-          {NAV.map((item) => (
+          {nav.map((item) => (
             <Link key={item.href} href={item.href} className={linkCls(item.href)}>
               {t(item.key)}
             </Link>
           ))}
+          {more.length > 0 && (
           <div className="relative">
             <button
               className="flex items-center gap-1 text-sm font-medium text-ink transition-colors hover:text-primary"
@@ -68,7 +73,7 @@ export default function Header() {
             </button>
             {moreOpen && (
               <div className="absolute right-0 top-full mt-2 w-72 rounded-card border border-line bg-white p-2 shadow-card">
-                {MORE.map((item) => (
+                {more.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
@@ -80,6 +85,7 @@ export default function Header() {
               </div>
             )}
           </div>
+          )}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -103,7 +109,7 @@ export default function Header() {
 
       {open && (
         <nav className="border-t border-line bg-white px-4 py-3 lg:hidden" aria-label="Mobile">
-          {[...NAV, ...MORE].map((item) => (
+          {[...nav, ...more].map((item) => (
             <Link
               key={item.href}
               href={item.href}

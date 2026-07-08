@@ -6,6 +6,8 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import Header from "@/components/public/Header";
 import Footer from "@/components/public/Footer";
+import { getDisabledPageKeys } from "@/lib/pageSettings";
+import { PAGES } from "@/lib/pages";
 
 const golos = Golos_Text({
   subsets: ["latin", "cyrillic"],
@@ -48,13 +50,16 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
+  const disabled = new Set(await getDisabledPageKeys());
+  const hiddenHrefs = PAGES.filter((p) => disabled.has(p.key)).map((p) => p.href);
+
   return (
     <html lang={locale}>
       <body className={`${golos.variable} font-sans`}>
         <NextIntlClientProvider>
-          <Header />
+          <Header hiddenHrefs={hiddenHrefs} />
           <main>{children}</main>
-          <Footer />
+          <Footer hiddenHrefs={hiddenHrefs} />
         </NextIntlClientProvider>
       </body>
     </html>
