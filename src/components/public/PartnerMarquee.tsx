@@ -14,9 +14,9 @@ function Row({ partners, direction }: { partners: PartnerItem[]; direction: "lef
               <Image
                 src={p.logoUrl}
                 alt={p.name}
-                width={176}
-                height={88}
-                className="max-h-12 w-auto max-w-full object-contain"
+                width={192}
+                height={96}
+                className="max-h-14 w-auto max-w-full object-contain"
               />
             </div>
           );

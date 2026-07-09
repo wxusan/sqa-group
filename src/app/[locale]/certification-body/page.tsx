@@ -65,9 +65,16 @@ export default async function CertificationBodyPage({ params }: { params: Promis
           </Reveal>
         </div>
         <Reveal delay={100}>
-          <figure className="card sticky top-24 overflow-hidden">
-            <Image src="/images/certificates/certification-body.jpeg" alt="O'ZAKK.MS.0052" width={500} height={690} className="w-full object-contain" />
-          </figure>
+          <a
+            href="/documents/sqa-certification-body-certificate.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card card-hover sticky top-24 block overflow-hidden"
+          >
+            <figure>
+              <Image src="/images/certificates/certification-body-2025.jpeg" alt="O'ZAKK.MS.0052" width={500} height={690} className="w-full object-contain" />
+            </figure>
+          </a>
         </Reveal>
       </div>
     </div>

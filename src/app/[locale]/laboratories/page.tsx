@@ -60,7 +60,7 @@ export default async function LaboratoriesPage({ params }: { params: Promise<{ l
       <div className="mt-12 grid max-w-3xl gap-5 sm:grid-cols-2">
         <Reveal>
           <CertificateCard
-            img="/images/certificates/testing-laboratory.jpeg"
+            img="/images/certificates/testing-laboratory-2025.jpeg"
             caption="O'ZAKK.SL.0162"
             href="/documents/sqa-laboratory-certificate.pdf"
             downloadLabel={t("downloadCert")}
@@ -68,7 +68,7 @@ export default async function LaboratoriesPage({ params }: { params: Promise<{ l
         </Reveal>
         <Reveal delay={80}>
           <CertificateCard
-            img="/images/certificates/s-lab-certificate.jpeg"
+            img="/images/certificates/s-lab-2026.jpeg"
             caption="O'ZAKK.SL.0437"
             href="/documents/sqa-s-lab-certificate.pdf"
             downloadLabel={t("downloadCert")}

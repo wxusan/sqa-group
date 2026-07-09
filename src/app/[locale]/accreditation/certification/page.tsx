@@ -34,17 +34,20 @@ export default async function AccredCertPage({ params }: { params: Promise<{ loc
             <p className="mt-4 text-xs text-ink-soft">{t("validUntil")}: 11.01.2027</p>
           </div>
           <a
-            href="/images/certificates/certification-body.jpeg"
+            href="/documents/sqa-certification-body-certificate.pdf"
             target="_blank"
+            rel="noopener noreferrer"
             className="mt-6 inline-block rounded-card bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary-bright"
           >
             {t("downloadCert")}
           </a>
         </Reveal>
         <Reveal delay={100}>
-          <figure className="card overflow-hidden">
-            <Image src="/images/certificates/certification-body.jpeg" alt="O'ZAKK.MS.0052" width={500} height={690} className="w-full object-contain" />
-          </figure>
+          <a href="/documents/sqa-certification-body-certificate.pdf" target="_blank" rel="noopener noreferrer" className="card card-hover block overflow-hidden">
+            <figure>
+              <Image src="/images/certificates/certification-body-2025.jpeg" alt="O'ZAKK.MS.0052" width={500} height={690} className="w-full object-contain" />
+            </figure>
+          </a>
         </Reveal>
       </div>
     </div>

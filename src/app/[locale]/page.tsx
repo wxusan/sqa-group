@@ -131,19 +131,33 @@ export default async function HomePage({
           </Reveal>
           <div className="mt-8 grid gap-5 sm:grid-cols-3">
             {[
-              { src: "/images/certificates/certification-body.jpeg", caption: "O'ZAKK.MS.0052" },
-              { src: "/images/certificates/testing-laboratory.jpeg", caption: "O'ZAKK.SL.0162" },
-              { src: "/images/certificates/s-lab-certificate.jpeg", caption: "O'ZAKK.SL.0437" },
+              {
+                src: "/images/certificates/certification-body-2025.jpeg",
+                caption: "O'ZAKK.MS.0052",
+                href: "/documents/sqa-certification-body-certificate.pdf",
+              },
+              {
+                src: "/images/certificates/testing-laboratory-2025.jpeg",
+                caption: "O'ZAKK.SL.0162",
+                href: "/documents/sqa-laboratory-certificate.pdf",
+              },
+              {
+                src: "/images/certificates/s-lab-2026.jpeg",
+                caption: "O'ZAKK.SL.0437",
+                href: "/documents/sqa-s-lab-certificate.pdf",
+              },
             ].map((c, i) => (
               <Reveal key={c.caption} delay={i * 80}>
-                <figure className="card overflow-hidden">
-                  <div className="relative aspect-[3/4] bg-white">
-                    <Image src={c.src} alt={c.caption} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-contain p-3" />
-                  </div>
-                  <figcaption className="border-t border-line px-4 py-2.5 text-center text-xs font-bold tracking-wide text-ink-soft">
-                    {c.caption}
-                  </figcaption>
-                </figure>
+                <a href={c.href} target="_blank" rel="noopener noreferrer" className="card card-hover block overflow-hidden">
+                  <figure>
+                    <div className="relative aspect-[3/4] bg-white">
+                      <Image src={c.src} alt={c.caption} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-contain p-3" />
+                    </div>
+                    <figcaption className="border-t border-line px-4 py-2.5 text-center text-xs font-bold tracking-wide text-ink-soft">
+                      {c.caption}
+                    </figcaption>
+                  </figure>
+                </a>
               </Reveal>
             ))}
           </div>
