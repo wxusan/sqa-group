@@ -3,14 +3,45 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminShell from "@/components/admin/AdminShell";
+import { adminHref, adminMessages, getAdminLocale } from "@/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminDashboard() {
+type LeadDelegate = {
+  count(args?: { where?: { status?: string } }): Promise<number>;
+};
+
+function getLeadDelegate(): LeadDelegate | null {
+  return (prisma as typeof prisma & { lead?: LeadDelegate }).lead ?? null;
+}
+
+async function getLeadCounts() {
+  const lead = getLeadDelegate();
+  if (!lead) return { total: 0, fresh: 0 };
+
+  try {
+    const [total, fresh] = await Promise.all([
+      lead.count(),
+      lead.count({ where: { status: "new" } }),
+    ]);
+    return { total, fresh };
+  } catch (error) {
+    console.warn("Lead table is not available yet. Run Prisma migrate/generate to enable applications dashboard counts.", error);
+    return { total: 0, fresh: 0 };
+  }
+}
+
+export default async function AdminDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ lang?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
+  const locale = getAdminLocale(await searchParams);
+  const t = adminMessages[locale];
 
-  const [staffTotal, staffPublished, newsTotal, newsPublished, partnersTotal, partnersPublished] =
+  const [staffTotal, staffPublished, newsTotal, newsPublished, partnersTotal, partnersPublished, leadCounts] =
     await Promise.all([
       prisma.staff.count(),
       prisma.staff.count({ where: { published: true } }),
@@ -18,39 +49,52 @@ export default async function AdminDashboard() {
       prisma.news.count({ where: { status: "published" } }),
       prisma.partner.count(),
       prisma.partner.count({ where: { published: true } }),
+      getLeadCounts(),
     ]);
 
   const cards = [
-    { href: "/admin/staff", label: "Staff", total: staffTotal, published: staffPublished },
-    { href: "/admin/news", label: "News", total: newsTotal, published: newsPublished },
-    { href: "/admin/partners", label: "Partners", total: partnersTotal, published: partnersPublished },
+    { href: "/admin/staff", label: t.nav.staff, total: staffTotal, published: staffPublished },
+    { href: "/admin/news", label: t.nav.news, total: newsTotal, published: newsPublished },
+    { href: "/admin/partners", label: t.nav.partners, total: partnersTotal, published: partnersPublished },
+    { href: "/admin/leads", label: t.nav.applications, total: leadCounts.total, published: leadCounts.fresh },
   ];
 
   return (
-    <AdminShell email={session.user.email ?? ""}>
-      <h1 className="text-2xl font-bold">Dashboard</h1>
+    <AdminShell email={session.user.email ?? ""} locale={locale}>
+      <h1 className="text-2xl font-bold">{t.dashboard.title}</h1>
       <p className="mt-1 text-sm text-ink-soft">
-        Items publish only when Uzbek, Russian and English translations are complete.
+        {t.dashboard.intro}
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((c) => (
-          <Link key={c.href} href={c.href} className="card card-hover bg-white p-6">
+          <Link key={c.href} href={adminHref(c.href, locale)} className="card card-hover bg-white p-6">
             <p className="text-sm font-semibold text-ink-soft">{c.label}</p>
             <p className="mt-2 text-3xl font-black text-ink">{c.total}</p>
             <p className="mt-1 text-xs text-ink-soft">
-              <span className="font-semibold text-green-700">{c.published} published</span>
-              {" · "}
-              {c.total - c.published} draft
+              {c.href === "/admin/leads" ? (
+                <>
+                  <span className="font-semibold text-amber-700">{c.published} {t.common.new}</span>
+                  {" · "}
+                  {c.total - c.published} {t.common.processed}
+                </>
+              ) : (
+                <>
+                  <span className="font-semibold text-green-700">{c.published} {t.common.published}</span>
+                  {" · "}
+                  {c.total - c.published} {t.common.draft}
+                </>
+              )}
             </p>
           </Link>
         ))}
       </div>
       <div className="card mt-6 bg-white p-6">
-        <h2 className="text-sm font-bold uppercase tracking-wide text-ink-soft">Quick actions</h2>
+        <h2 className="text-sm font-bold uppercase tracking-wide text-ink-soft">{t.dashboard.quickActions}</h2>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Link href="/admin/staff/new" className="rounded-card bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-bright">+ Staff member</Link>
-          <Link href="/admin/news/new" className="rounded-card bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-bright">+ News article</Link>
-          <Link href="/admin/partners/new" className="rounded-card bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-bright">+ Partner</Link>
+          <Link href={adminHref("/admin/staff/new", locale)} className="rounded-card bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-bright">{t.dashboard.addStaff}</Link>
+          <Link href={adminHref("/admin/news/new", locale)} className="rounded-card bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-bright">{t.dashboard.addNews}</Link>
+          <Link href={adminHref("/admin/partners/new", locale)} className="rounded-card bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary-bright">{t.dashboard.addPartner}</Link>
+          <Link href={adminHref("/admin/leads", locale)} className="rounded-card border border-line bg-white px-4 py-2 text-sm font-semibold text-ink hover:border-primary hover:text-primary">{t.nav.applications}</Link>
         </div>
       </div>
     </AdminShell>

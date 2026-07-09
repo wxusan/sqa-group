@@ -2,7 +2,6 @@ import { writeFile, mkdir, readdir, unlink, stat } from "fs/promises";
 import path from "path";
 import crypto from "crypto";
 
-const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
 function cloudinaryConfigured() {
@@ -19,26 +18,48 @@ function cloudinaryConfigured() {
  * Returns the public URL.
  */
 export async function storeImage(file: File): Promise<string> {
-  if (!ALLOWED.includes(file.type)) {
-    throw new Error("Only JPG, PNG, WEBP or SVG images are allowed");
-  }
   if (file.size > MAX_SIZE) {
     throw new Error("Image must be 5MB or smaller");
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-
-  if (cloudinaryConfigured()) {
-    return uploadToCloudinary(buffer, file.type);
+  const detected = detectImage(buffer);
+  if (!detected) {
+    throw new Error("Only JPG, PNG or WEBP images are allowed");
   }
 
-  const ext =
-    file.type === "image/svg+xml" ? "svg" : file.type.split("/")[1] ?? "bin";
-  const name = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}.${ext}`;
+  if (cloudinaryConfigured()) {
+    return uploadToCloudinary(buffer, detected.mime);
+  }
+
+  const name = `${Date.now()}-${crypto.randomBytes(4).toString("hex")}.${detected.ext}`;
   const dir = path.join(process.cwd(), "public", "uploads");
   await mkdir(dir, { recursive: true });
   await writeFile(path.join(dir, name), buffer);
   return `/uploads/${name}`;
+}
+
+function detectImage(buffer: Buffer): { mime: string; ext: string } | null {
+  if (buffer.length < 12) return null;
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return { mime: "image/jpeg", ext: "jpg" };
+  }
+  if (
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47 &&
+    buffer[4] === 0x0d &&
+    buffer[5] === 0x0a &&
+    buffer[6] === 0x1a &&
+    buffer[7] === 0x0a
+  ) {
+    return { mime: "image/png", ext: "png" };
+  }
+  if (buffer.subarray(0, 4).toString("ascii") === "RIFF" && buffer.subarray(8, 12).toString("ascii") === "WEBP") {
+    return { mime: "image/webp", ext: "webp" };
+  }
+  return null;
 }
 
 async function uploadToCloudinary(buffer: Buffer, mime: string) {
@@ -84,5 +105,10 @@ export async function listLocalUploads() {
 
 export async function deleteLocalUpload(name: string) {
   if (name.includes("/") || name.includes("..")) throw new Error("Bad name");
-  await unlink(path.join(process.cwd(), "public", "uploads", name));
+  try {
+    await unlink(path.join(process.cwd(), "public", "uploads", name));
+  } catch (e) {
+    if (e instanceof Error && "code" in e && e.code === "ENOENT") return;
+    throw e;
+  }
 }

@@ -1,8 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { guardPage } from "@/lib/pageSettings";
 import Reveal from "@/components/public/Reveal";
-import CopyTemplate from "@/components/public/CopyTemplate";
-import DocDownload from "@/components/public/DocDownload";
+import ComplaintForm from "@/components/public/ComplaintForm";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -42,15 +41,11 @@ export default async function AppealsPage({ params }: { params: Promise<{ locale
         </Reveal>
 
         <Reveal delay={90}>
-          <section className="card p-6">
-            <h2 className="text-xl font-bold">{t("templateTitle")}</h2>
-            <p className="mt-2 text-sm text-ink-soft">{t("templateText")}</p>
-            <pre className="mt-4 overflow-x-auto whitespace-pre-wrap rounded-card border border-line bg-band p-5 font-sans text-sm leading-relaxed text-ink">
-              {t("templateBody")}
-            </pre>
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <CopyTemplate text={t("templateBody")} copyLabel={t("copyTemplate")} copiedLabel={t("copied")} />
-              <DocDownload href="/documents/complaints-and-appeals.docx" label={t("downloadWord")} />
+          <section className="card p-6 sm:p-7">
+            <h2 className="text-xl font-bold">{t("formTitle")}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-ink-soft">{t("formIntro")}</p>
+            <div className="mt-5">
+              <ComplaintForm />
             </div>
           </section>
         </Reveal>

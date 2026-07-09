@@ -15,6 +15,7 @@ export const PAGES: PageDef[] = [
   { key: "team", href: "/team", navKey: "team", label: "Team", group: "main" },
   { key: "news", href: "/news", navKey: "news", label: "News", group: "main" },
   { key: "contacts", href: "/contacts", navKey: "contacts", label: "Contacts", group: "main" },
+  { key: "apply", href: "/apply", navKey: "apply", label: "Apply", group: "more" },
   { key: "financing", href: "/financing", navKey: "financing", label: "Financing", group: "more" },
   { key: "schemes", href: "/schemes", navKey: "schemes", label: "Certification schemes", group: "more" },
   { key: "accreditation-certification", href: "/accreditation/certification", navKey: "accreditationCertification", label: "Accreditation — certification", group: "more" },

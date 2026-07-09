@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { guardPage } from "@/lib/pageSettings";
 import Reveal from "@/components/public/Reveal";
 import { CertificateCard } from "@/components/public/DocDownload";
+import ApplySection from "@/components/public/ApplySection";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -75,6 +76,8 @@ export default async function LaboratoriesPage({ params }: { params: Promise<{ l
           />
         </Reveal>
       </div>
+
+      <ApplySection defaultService="testing" />
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { guardPage } from "@/lib/pageSettings";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import Reveal from "@/components/public/Reveal";
 import DocDownload from "@/components/public/DocDownload";
+import ApplySection from "@/components/public/ApplySection";
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -77,6 +78,8 @@ export default async function CertificationBodyPage({ params }: { params: Promis
           </a>
         </Reveal>
       </div>
+
+      <ApplySection defaultService="certification" />
     </div>
   );
 }

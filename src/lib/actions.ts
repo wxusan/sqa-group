@@ -9,6 +9,7 @@ import { missingTranslations } from "@/lib/publish";
 import { slugify } from "@/lib/slug";
 import { locales } from "@/i18n/routing";
 import { PAGE_KEYS } from "@/lib/pages";
+import { adminHref, adminMessages, getAdminLocale, type AdminLocale } from "@/i18n/admin";
 
 async function requireAdmin() {
   const session = await auth();
@@ -24,6 +25,8 @@ function revalidatePublic() {
 /* ---------------- auth ---------------- */
 
 export async function loginAction(_prev: { error?: string } | undefined, formData: FormData) {
+  const adminLocale = adminLocaleFromForm(formData);
+  const t = adminMessages[adminLocale];
   try {
     await signIn("credentials", {
       email: formData.get("email"),
@@ -31,14 +34,15 @@ export async function loginAction(_prev: { error?: string } | undefined, formDat
       redirect: false,
     });
   } catch {
-    return { error: "Invalid login or password" };
+    return { error: t.auth.invalid };
   }
-  redirect("/admin");
+  redirect(adminHref("/admin", adminLocale));
 }
 
-export async function logoutAction() {
+export async function logoutAction(formData: FormData) {
+  const adminLocale = adminLocaleFromForm(formData);
   await signOut({ redirect: false });
-  redirect("/admin/login");
+  redirect(adminHref("/admin/login", adminLocale));
 }
 
 /* ---------------- shared helpers ---------------- */
@@ -61,12 +65,27 @@ function translationFields(formData: FormData, fields: string[]) {
   });
 }
 
+function adminLocaleFromForm(formData: FormData): AdminLocale {
+  return getAdminLocale({ lang: String(formData.get("adminLang") ?? "") });
+}
+
+function localizedPublishError(problems: string[], locale: AdminLocale) {
+  const t = adminMessages[locale];
+  const localized = problems.map((problem) =>
+    problem
+      .replace("missing translation", t.common.missingTranslation)
+      .replace(/: ([a-zA-Z]+) is empty$/, (_, field: string) => `: ${field} ${t.common.emptyField}`)
+  );
+  return `${t.common.fixBeforePublish}: ${localized.join("; ")}`;
+}
+
 /* ---------------- staff ---------------- */
 
 const STAFF_REQUIRED = ["name", "position"];
 
 export async function saveStaff(_prev: { error?: string } | undefined, formData: FormData) {
   await requireAdmin();
+  const adminLocale = adminLocaleFromForm(formData);
   const id = String(formData.get("id") ?? "");
   const wantPublish = formData.get("published") === "on";
 
@@ -75,13 +94,16 @@ export async function saveStaff(_prev: { error?: string } | undefined, formData:
   if (wantPublish) {
     const problems = missingTranslations(translations, STAFF_REQUIRED);
     if (problems.length > 0) {
-      return { error: `Cannot publish — fix first: ${problems.join("; ")}` };
+      return { error: localizedPublishError(problems, adminLocale) };
     }
   }
 
-  const photoUrl = await maybeUpload(formData, "photo").catch((e: Error) => {
-    throw new Error(e.message);
-  });
+  let photoUrl: string | undefined;
+  try {
+    photoUrl = await maybeUpload(formData, "photo");
+  } catch {
+    return { error: adminMessages[adminLocale].common.uploadFailed };
+  }
 
   const base = {
     department: String(formData.get("department") ?? "certification"),
@@ -122,7 +144,7 @@ export async function saveStaff(_prev: { error?: string } | undefined, formData:
   }
 
   revalidatePublic();
-  redirect("/admin/staff");
+  redirect(adminHref("/admin/staff", adminLocale));
 }
 
 export async function deleteStaff(formData: FormData) {
@@ -139,6 +161,7 @@ const NEWS_REQUIRED = ["title", "body"];
 
 export async function saveNews(_prev: { error?: string } | undefined, formData: FormData) {
   await requireAdmin();
+  const adminLocale = adminLocaleFromForm(formData);
   const id = String(formData.get("id") ?? "");
   const wantPublish = formData.get("publish") === "on";
 
@@ -147,11 +170,16 @@ export async function saveNews(_prev: { error?: string } | undefined, formData: 
   if (wantPublish) {
     const problems = missingTranslations(translations, NEWS_REQUIRED);
     if (problems.length > 0) {
-      return { error: `Cannot publish — fix first: ${problems.join("; ")}` };
+      return { error: localizedPublishError(problems, adminLocale) };
     }
   }
 
-  const imageUrl = await maybeUpload(formData, "image");
+  let imageUrl: string | undefined;
+  try {
+    imageUrl = await maybeUpload(formData, "image");
+  } catch {
+    return { error: adminMessages[adminLocale].common.uploadFailed };
+  }
 
   const base = {
     status: wantPublish ? "published" : "draft",
@@ -195,7 +223,7 @@ export async function saveNews(_prev: { error?: string } | undefined, formData: 
   }
 
   revalidatePublic();
-  redirect("/admin/news");
+  redirect(adminHref("/admin/news", adminLocale));
 }
 
 export async function deleteNews(formData: FormData) {
@@ -212,6 +240,7 @@ const PARTNER_REQUIRED = ["name"];
 
 export async function savePartner(_prev: { error?: string } | undefined, formData: FormData) {
   await requireAdmin();
+  const adminLocale = adminLocaleFromForm(formData);
   const id = String(formData.get("id") ?? "");
   const wantPublish = formData.get("published") === "on";
 
@@ -220,13 +249,18 @@ export async function savePartner(_prev: { error?: string } | undefined, formDat
   if (wantPublish) {
     const problems = missingTranslations(translations, PARTNER_REQUIRED);
     if (problems.length > 0) {
-      return { error: `Cannot publish — fix first: ${problems.join("; ")}` };
+      return { error: localizedPublishError(problems, adminLocale) };
     }
   }
 
-  const logoUrl = await maybeUpload(formData, "logo");
+  let logoUrl: string | undefined;
+  try {
+    logoUrl = await maybeUpload(formData, "logo");
+  } catch {
+    return { error: adminMessages[adminLocale].common.uploadFailed };
+  }
   if (!id && !logoUrl) {
-    return { error: "A logo image is required for a new partner" };
+    return { error: adminMessages[adminLocale].partners.logoRequired };
   }
 
   const base = {
@@ -257,7 +291,7 @@ export async function savePartner(_prev: { error?: string } | undefined, formDat
   }
 
   revalidatePublic();
-  redirect("/admin/partners");
+  redirect(adminHref("/admin/partners", adminLocale));
 }
 
 export async function deletePartner(formData: FormData) {
@@ -273,7 +307,11 @@ export async function deletePartner(formData: FormData) {
 export async function deleteMedia(formData: FormData) {
   await requireAdmin();
   const name = String(formData.get("name") ?? "");
-  if (name) await deleteLocalUpload(name);
+  try {
+    if (name) await deleteLocalUpload(name);
+  } catch {
+    // Keep the media library usable even if a stale or invalid local file entry is submitted.
+  }
   revalidatePath("/admin/media");
 }
 
@@ -281,9 +319,10 @@ export async function deleteMedia(formData: FormData) {
 
 export async function setPageEnabled(formData: FormData) {
   await requireAdmin();
+  const adminLocale = adminLocaleFromForm(formData);
   const key = String(formData.get("key") ?? "");
   const enabled = String(formData.get("enabled") ?? "") === "true";
-  if (!key || !PAGE_KEYS.has(key)) return;
+  if (!key || !PAGE_KEYS.has(key)) redirect(adminHref("/admin/pages", adminLocale));
   await prisma.pageSetting.upsert({
     where: { key },
     update: { enabled },
@@ -291,4 +330,5 @@ export async function setPageEnabled(formData: FormData) {
   });
   revalidatePublic();
   revalidatePath("/admin/pages");
+  redirect(adminHref("/admin/pages", adminLocale));
 }

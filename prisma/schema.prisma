@@ -87,6 +87,19 @@ model AdminUser {
   name         String?
 }
 
+model Lead {
+  id          String   @id @default(cuid())
+  name        String
+  phone       String
+  email       String?
+  company     String?
+  serviceType String // certification | testing | surveillance | other
+  message     String
+  status      String   @default("new") // new | processed
+  locale      String   @default("uz")
+  createdAt   DateTime @default(now())
+}
+
 /* Per-page visibility toggle controlled from the admin panel.
    A missing row means the page is enabled (default on). */
 model PageSetting {

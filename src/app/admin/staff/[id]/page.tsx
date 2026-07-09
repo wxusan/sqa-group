@@ -3,13 +3,22 @@ import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import AdminShell from "@/components/admin/AdminShell";
 import StaffForm from "@/components/admin/StaffForm";
+import { adminMessages, getAdminLocale } from "@/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminStaffEdit({ params }: { params: Promise<{ id: string }> }) {
+export default async function AdminStaffEdit({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ lang?: string }>;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
   const { id } = await params;
+  const locale = getAdminLocale(await searchParams);
+  const t = adminMessages[locale];
 
   const isNew = id === "new";
   const staff = isNew
@@ -18,11 +27,11 @@ export default async function AdminStaffEdit({ params }: { params: Promise<{ id:
   if (!isNew && !staff) notFound();
 
   return (
-    <AdminShell email={session.user.email ?? ""}>
-      <h1 className="text-2xl font-bold">{isNew ? "New staff member" : "Edit staff member"}</h1>
-      <p className="mt-1 text-sm text-ink-soft">Fill all three languages to publish.</p>
+    <AdminShell email={session.user.email ?? ""} locale={locale}>
+      <h1 className="text-2xl font-bold">{isNew ? t.staff.newTitle : t.staff.editTitle}</h1>
+      <p className="mt-1 text-sm text-ink-soft">{t.staff.editIntro}</p>
       <div className="mt-6">
-        <StaffForm staff={staff ?? undefined} />
+        <StaffForm staff={staff ?? undefined} locale={locale} />
       </div>
     </AdminShell>
   );

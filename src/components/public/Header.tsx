@@ -16,6 +16,7 @@ const NAV = [
 ] as const;
 
 const MORE = [
+  { href: "/apply", key: "apply" },
   { href: "/financing", key: "financing" },
   { href: "/schemes", key: "schemes" },
   { href: "/accreditation/certification", key: "accreditationCertification" },
