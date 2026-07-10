@@ -7,31 +7,6 @@ import { adminHref, adminMessages, getAdminLocale } from "@/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
-type LeadItem = {
-  id: string;
-  name: string;
-  phone: string;
-  email: string | null;
-  company: string | null;
-  serviceType: string;
-  message: string;
-  status: string;
-  locale: string;
-  createdAt: Date;
-};
-
-type LeadDelegate = {
-  findMany(args: {
-    orderBy: { createdAt: "desc" };
-    where?: { status: string };
-  }): Promise<LeadItem[]>;
-  count(args?: { where?: { status?: string } }): Promise<number>;
-};
-
-function getLeadDelegate(): LeadDelegate | null {
-  return (prisma as typeof prisma & { lead?: LeadDelegate }).lead ?? null;
-}
-
 export default async function AdminLeadsPage({
   searchParams,
 }: {
@@ -44,27 +19,13 @@ export default async function AdminLeadsPage({
   const locale = getAdminLocale(params);
   const t = adminMessages[locale];
 
-  const lead = getLeadDelegate();
-  let leads: LeadItem[] = [];
-  let newCount = 0;
-  let setupError = false;
-
-  if (lead) {
-    try {
-      [leads, newCount] = await Promise.all([
-        lead.findMany({
-          orderBy: { createdAt: "desc" },
-          where: status === "new" || status === "processed" ? { status } : undefined,
-        }),
-        lead.count({ where: { status: "new" } }),
-      ]);
-    } catch (error) {
-      console.warn("Lead table is not available yet. Run Prisma migrate/generate to enable applications inbox.", error);
-      setupError = true;
-    }
-  } else {
-    setupError = true;
-  }
+  const [leads, newCount] = await Promise.all([
+    prisma.lead.findMany({
+      orderBy: { createdAt: "desc" },
+      where: status === "new" || status === "processed" ? { status } : undefined,
+    }),
+    prisma.lead.count({ where: { status: "new" } }),
+  ]);
 
   return (
     <AdminShell email={session.user.email ?? ""} locale={locale}>
@@ -94,12 +55,6 @@ export default async function AdminLeadsPage({
         </div>
       </div>
       <p className="mt-1 text-sm text-ink-soft">{t.leads.intro}</p>
-
-      {setupError && (
-        <div className="mt-6 rounded-card border border-amber-200 bg-amber-50 p-4 text-sm leading-relaxed text-amber-900">
-          Applications storage is not ready in this running dev server yet. Run <code className="font-mono">npx prisma generate</code>, apply the new migration, and restart <code className="font-mono">next dev</code>.
-        </div>
-      )}
 
       <div className="mt-6 space-y-4">
         {leads.map((lead) => (

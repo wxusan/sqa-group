@@ -7,28 +7,12 @@ import { adminHref, adminMessages, getAdminLocale } from "@/i18n/admin";
 
 export const dynamic = "force-dynamic";
 
-type LeadDelegate = {
-  count(args?: { where?: { status?: string } }): Promise<number>;
-};
-
-function getLeadDelegate(): LeadDelegate | null {
-  return (prisma as typeof prisma & { lead?: LeadDelegate }).lead ?? null;
-}
-
 async function getLeadCounts() {
-  const lead = getLeadDelegate();
-  if (!lead) return { total: 0, fresh: 0 };
-
-  try {
-    const [total, fresh] = await Promise.all([
-      lead.count(),
-      lead.count({ where: { status: "new" } }),
-    ]);
-    return { total, fresh };
-  } catch (error) {
-    console.warn("Lead table is not available yet. Run Prisma migrate/generate to enable applications dashboard counts.", error);
-    return { total: 0, fresh: 0 };
-  }
+  const [total, fresh] = await Promise.all([
+    prisma.lead.count(),
+    prisma.lead.count({ where: { status: "new" } }),
+  ]);
+  return { total, fresh };
 }
 
 export default async function AdminDashboard({

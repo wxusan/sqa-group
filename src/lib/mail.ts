@@ -1,4 +1,5 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
+import { logWarn } from "@/lib/logger";
 
 type Attachment = {
   filename: string;
@@ -16,33 +17,29 @@ type CompanyMail = {
 export const COMPANY_RECEIVER_EMAIL = process.env.COMPANY_RECEIVER_EMAIL ?? "info@sqa.uz";
 
 export async function sendCompanyEmail({ subject, text, html, attachments = [] }: CompanyMail) {
-  const host = process.env.SMTP_HOST;
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.RESEND_FROM;
 
-  if (!host || !user || !pass) {
-    console.warn(
-      `SMTP is not configured. Email to ${COMPANY_RECEIVER_EMAIL} was not sent. Subject: ${subject}`
-    );
+  if (!apiKey || !from) {
+    logWarn("mail.not_configured");
     return { sent: false, skipped: true };
   }
 
-  const port = Number(process.env.SMTP_PORT ?? 587);
-  const transporter = nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
-
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM ?? user,
+  const resend = new Resend(apiKey);
+  const result = await resend.emails.send({
+    from,
     to: COMPANY_RECEIVER_EMAIL,
-    subject,
+    subject: subject.replace(/[\r\n]+/g, " "),
     text,
     html,
-    attachments,
+    attachments: attachments.map((attachment) => ({
+      filename: attachment.filename,
+      content: attachment.content,
+      content_type: attachment.contentType,
+    })),
   });
 
-  return { sent: true, skipped: false };
+  if (result.error) throw new Error(`Resend delivery failed: ${result.error.name}`);
+
+  return { sent: true, skipped: false, id: result.data?.id };
 }

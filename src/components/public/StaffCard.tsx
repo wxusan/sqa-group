@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { isLocalMediaUrl } from "@/lib/media-url";
 
 export default function StaffCard({
   slug,
@@ -22,6 +23,7 @@ export default function StaffCard({
             src={photoUrl}
             alt={name}
             fill
+            unoptimized={isLocalMediaUrl(photoUrl)}
             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-cover object-top transition-transform duration-300 group-hover:scale-[1.04]"
           />

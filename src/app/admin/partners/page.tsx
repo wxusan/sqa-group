@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import AdminShell from "@/components/admin/AdminShell";
 import LocaleBadges from "@/components/admin/LocaleBadges";
 import { deletePartner } from "@/lib/actions";
+import { isLocalMediaUrl } from "@/lib/media-url";
 import { adminHref, adminMessages, getAdminLocale } from "@/i18n/admin";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,7 @@ export default async function AdminPartnersList({
           return (
             <div key={p.id} className="card bg-white p-5">
               <div className="flex h-20 items-center justify-center rounded-card bg-band p-3">
-                <Image src={p.logoUrl} alt={name} width={140} height={64} className="max-h-14 w-auto object-contain" />
+                <Image src={p.logoUrl} alt={name} width={140} height={64} unoptimized={isLocalMediaUrl(p.logoUrl)} className="max-h-14 w-auto object-contain" />
               </div>
               <div className="mt-3 flex items-center justify-between gap-2">
                 <span className="font-semibold">{name}</span>

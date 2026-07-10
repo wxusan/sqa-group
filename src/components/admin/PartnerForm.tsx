@@ -7,6 +7,7 @@ import TranslationTabs from "./TranslationTabs";
 import SubmitButton from "./SubmitButton";
 import { Input } from "./Field";
 import { adminMessages, type AdminLocale } from "@/i18n/admin";
+import { isLocalMediaUrl } from "@/lib/media-url";
 import FileUploadButton from "./FileUploadButton";
 
 type PartnerData = {
@@ -22,27 +23,29 @@ export default function PartnerForm({ partner, locale }: { partner?: PartnerData
   const [state, action] = useActionState(savePartner, undefined);
   const tr = (locale: string) => partner?.translations.find((t) => t.locale === locale);
   const t = adminMessages[locale];
+  const value = (name: string, fallback = "") => state?.values?.[name] ?? fallback;
+  const published = state?.values ? state.values.published === "on" : (partner?.published ?? true);
 
   return (
-    <form action={action} className="space-y-6">
+    <form key={state?.formKey ?? partner?.id ?? "new"} action={action} className="space-y-6">
       {partner && <input type="hidden" name="id" value={partner.id} />}
       <input type="hidden" name="adminLang" value={locale} />
 
       <TranslationTabs
         render={(locale) => (
-          <Input label={`${t.partners.name} (${locale})`} name={`${locale}_name`} defaultValue={tr(locale)?.name ?? ""} />
+          <Input label={`${t.partners.name} (${locale})`} name={`${locale}_name`} defaultValue={value(`${locale}_name`, tr(locale)?.name ?? "")} />
         )}
       />
 
       <div className="card bg-white p-5">
         <h2 className="text-sm font-bold uppercase tracking-wide text-ink-soft">{t.common.settings}</h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
-          <Input label={t.partners.websiteUrl} name="websiteUrl" type="url" placeholder="https://..." defaultValue={partner?.websiteUrl ?? ""} />
-          <Input label={t.partners.sortOrder} name="order" type="number" defaultValue={partner?.order ?? 0} />
+          <Input label={t.partners.websiteUrl} name="websiteUrl" type="url" placeholder="https://..." defaultValue={value("websiteUrl", partner?.websiteUrl ?? "")} />
+          <Input label={t.partners.sortOrder} name="order" type="number" min={0} max={10000} defaultValue={value("order", String(partner?.order ?? 0))} />
         </div>
         <div className="mt-4 flex items-center gap-6">
           <label className="flex items-center gap-2">
-            <input type="checkbox" name="published" defaultChecked={partner?.published ?? true} className="h-4 w-4 accent-[#2003bd]" />
+            <input type="checkbox" name="published" defaultChecked={published} className="h-4 w-4 accent-[#2003bd]" />
             <span className="text-sm font-semibold">{t.common.showOnSite}</span>
           </label>
           <div className="flex items-center gap-4">
@@ -55,7 +58,7 @@ export default function PartnerForm({ partner, locale }: { partner?: PartnerData
               noFileLabel={t.common.noFileSelected}
             />
             {partner?.logoUrl && (
-              <Image src={partner.logoUrl} alt="" width={100} height={48} className="max-h-12 w-auto rounded-card border border-line object-contain p-1" />
+              <Image src={partner.logoUrl} alt="" width={100} height={48} unoptimized={isLocalMediaUrl(partner.logoUrl)} className="max-h-12 w-auto rounded-card border border-line object-contain p-1" />
             )}
           </div>
         </div>

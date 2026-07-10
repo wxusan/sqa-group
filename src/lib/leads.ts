@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import { logError, logWarn } from "@/lib/logger";
 import { COMPANY_RECEIVER_EMAIL, sendCompanyEmail } from "@/lib/mail";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -39,19 +40,18 @@ export async function submitApplication(_prev: LeadState | undefined, formData: 
   }
 
   try {
-    const lead = (prisma as typeof prisma & {
-      lead?: { create(args: { data: Record<string, string | null> }): Promise<unknown> };
-    }).lead;
-    await lead?.create({
+    await prisma.lead.create({
       data: { name, phone, email: email || null, company: company || null, serviceType, message, locale },
     });
   } catch (error) {
-    console.warn("Lead table is not available; continuing with email-only application submission.", error);
+    logError("lead.create_failed", error, { service_type: serviceType });
+    return { error: "persistence" };
   }
 
-  await sendCompanyEmail({
-    subject: `Yangi ariza: ${SERVICE_LABEL_UZ[serviceType] ?? serviceType} - ${name}`,
-    text: [
+  try {
+    const mail = await sendCompanyEmail({
+      subject: `Yangi ariza: ${SERVICE_LABEL_UZ[serviceType] ?? serviceType} - ${name}`,
+      text: [
       "Sayt orqali yangi ariza qabul qilindi.",
       "",
       `Xizmat turi: ${SERVICE_LABEL_UZ[serviceType] ?? serviceType}`,
@@ -65,8 +65,8 @@ export async function submitApplication(_prev: LeadState | undefined, formData: 
       message,
       "",
       `Qabul qiluvchi: ${COMPANY_RECEIVER_EMAIL}`,
-    ].join("\n"),
-    html: `
+      ].join("\n"),
+      html: `
       <div style="font-family:Arial,sans-serif;line-height:1.55;color:#1f2937">
         <h2 style="margin:0 0 12px;color:#2003bd">Sayt orqali yangi ariza qabul qilindi</h2>
         <p>Quyida ariza beruvchi tomonidan yuborilgan ma'lumotlar keltirilgan.</p>
@@ -83,8 +83,14 @@ export async function submitApplication(_prev: LeadState | undefined, formData: 
         <h3 style="margin:18px 0 8px">Mahsulot va so'rov tafsilotlari</h3>
         <div style="white-space:pre-wrap;border:1px solid #e5e7eb;background:#f8fafc;padding:12px">${escapeHtml(message)}</div>
       </div>
-    `,
-  });
+      `,
+    });
+    if (mail.skipped) logWarn("lead.email_skipped", { service_type: serviceType });
+  } catch (error) {
+    // The application is already durable in the admin inbox; do not discard it
+    // just because a notification email could not be delivered.
+    logError("lead.email_failed", error, { service_type: serviceType });
+  }
 
   revalidatePath("/admin/leads");
   return { ok: true };
@@ -103,10 +109,7 @@ export async function setLeadStatus(formData: FormData) {
   if (!session?.user) throw new Error("Unauthorized");
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "new");
-  const lead = (prisma as typeof prisma & {
-    lead?: { update(args: { where: { id: string }; data: { status: string } }): Promise<unknown> };
-  }).lead;
-  if (id && lead) await lead.update({ where: { id }, data: { status: status === "processed" ? "processed" : "new" } });
+  if (id) await prisma.lead.updateMany({ where: { id }, data: { status: status === "processed" ? "processed" : "new" } });
   revalidatePath("/admin/leads");
 }
 
@@ -114,9 +117,6 @@ export async function deleteLead(formData: FormData) {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
   const id = String(formData.get("id") ?? "");
-  const lead = (prisma as typeof prisma & {
-    lead?: { delete(args: { where: { id: string } }): Promise<unknown> };
-  }).lead;
-  if (id && lead) await lead.delete({ where: { id } });
+  if (id) await prisma.lead.deleteMany({ where: { id } });
   revalidatePath("/admin/leads");
 }

@@ -89,7 +89,7 @@ const NEWS = [
   {
     slug: "akkreditatsiya-guvohnomalari-2027",
     publishedAt: new Date("2026-02-10"),
-    image: "/images/certificates/certification-body.jpeg",
+    image: "/images/certificates/certification-body-2025.jpeg",
     uz: {
       title: "Akkreditatsiya guvohnomalarimiz 2027 yilgacha amal qiladi",
       summary: "Sertifikatlash organi va sinov laboratoriyasi O'ZAKK guvohnomalari yangilangan muddatlar bilan amalda.",
@@ -149,14 +149,22 @@ const NEWS = [
 ];
 
 async function main() {
-  /* admin user */
-  const email = (process.env.ADMIN_EMAIL ?? "sqa_admin").toLowerCase();
-  const password = process.env.ADMIN_PASSWORD ?? "adminsqa1";
-  await prisma.adminUser.upsert({
-    where: { email },
-    update: { passwordHash: await hash(password, 10) },
-    create: { email, passwordHash: await hash(password, 10), name: "SQA Admin" },
-  });
+  /*
+   * Seeding must never reset a real administrator's password. It can create
+   * the first local-development admin only when both values are supplied.
+   */
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  if (email && password) {
+    const existingAdmin = await prisma.adminUser.findUnique({ where: { email }, select: { id: true } });
+    if (!existingAdmin) {
+      await prisma.adminUser.create({
+        data: { email, passwordHash: await hash(password, 12), name: "SQA Admin" },
+      });
+    }
+  } else {
+    console.info("Skipping admin seed: ADMIN_EMAIL and ADMIN_PASSWORD are required to create the first admin.");
+  }
 
   /* staff */
   for (let i = 0; i < STAFF.length; i++) {
@@ -182,19 +190,24 @@ async function main() {
     });
   }
 
-  /* partners — authoritative: mirror the PARTNERS list exactly */
-  await prisma.partner.deleteMany();
+  /* Partners are additive only. Admin-managed rows and uploaded logos survive reseeding. */
   for (const p of PARTNERS) {
-    await prisma.partner.create({
-      data: {
-        logoUrl: p.logo,
-        order: p.order,
-        published: true,
-        translations: {
-          create: (["uz", "ru", "en"] as const).map((locale) => ({ locale, name: p.name })),
-        },
-      },
+    const existingPartner = await prisma.partner.findFirst({
+      where: { translations: { some: { locale: "uz", name: p.name } } },
+      select: { id: true },
     });
+    if (!existingPartner) {
+      await prisma.partner.create({
+        data: {
+          logoUrl: p.logo,
+          order: p.order,
+          published: true,
+          translations: {
+            create: (["uz", "ru", "en"] as const).map((locale) => ({ locale, name: p.name })),
+          },
+        },
+      });
+    }
   }
 
   /* news */

@@ -30,21 +30,28 @@ Admin: `http://localhost:3000/admin` — credentials from `.env` (`ADMIN_EMAIL` 
 - **Publishing rule** (enforced server-side): an item cannot be published until uz, ru and en translations are complete. The admin shows per-locale completeness badges.
 - **Partner carousel**: two rows, opposite directions, pause on hover, seamless loop, static grid under `prefers-reduced-motion`.
 - **Signature design element**: guilloche accreditation ribbon with real O'ZAK registry data (MS.0052 / SL.0162).
-- **Media storage**: local `/public/uploads` by default; set `CLOUDINARY_*` env vars to switch to Cloudinary automatically (required for Vercel — its filesystem is ephemeral).
+- **Media storage**: Vercel Blob in production for durable images; local `/public/uploads` is used only for development and isolated browser tests.
 - SEO: per-locale metadata, hreflang alternates, sitemap.xml, robots.txt (admin excluded).
 
 ## Tests
 
 ```bash
-npx vitest run          # unit: publish rule, slugify
-npx playwright test     # e2e: starts the prod server itself (build first: npm run build)
+npm run test:unit
+
+# Browser tests use a dedicated local database and refuse to run against any
+# other database. Create it once, then apply the schema and seed it:
+createdb sqa_audit
+DATABASE_URL="postgresql://sqa:sqa@127.0.0.1:5432/sqa_audit" npx prisma migrate deploy
+DATABASE_URL="postgresql://sqa:sqa@127.0.0.1:5432/sqa_audit" npx prisma db seed
+cp .env.e2e.example .env.e2e.local
+npm run build && npm run test:e2e
 ```
 
 E2E covers: homepage desktop+mobile, carousel directions, staff/news card → detail, language switcher preserving pages, admin auth redirect + login.
 
 ## Deploying
 
-- **Vercel**: set `DATABASE_URL` (Supabase/Railway/Neon), `AUTH_SECRET` (generate: `openssl rand -base64 32`), `AUTH_TRUST_HOST=true`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `CLOUDINARY_*`, `NEXT_PUBLIC_SITE_URL=https://www.sqa.uz`. Run `npx prisma migrate deploy && npx prisma db seed` against prod DB once.
+- **Vercel**: set `DATABASE_URL`, `AUTH_SECRET` (generate: `openssl rand -base64 32`), `AUTH_TRUST_HOST=true`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `BLOB_READ_WRITE_TOKEN`, and `NEXT_PUBLIC_SITE_URL=https://www.sqa.uz`. Vercel Blob is required for durable admin image uploads. Run `npx prisma migrate deploy` against production before deploying migrations; seed only when bootstrapping an empty database.
 - Old certificates/team photos/partner logos are already migrated into `/public/images`.
 
 ## Known follow-ups

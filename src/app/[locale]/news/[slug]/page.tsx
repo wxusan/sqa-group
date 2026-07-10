@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
+import { isLocalMediaUrl } from "@/lib/media-url";
 import NewsCard from "@/components/public/NewsCard";
 import Reveal from "@/components/public/Reveal";
 
@@ -66,7 +67,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ loc
       {article.imageUrl && (
         <Reveal delay={80}>
           <figure className="card mx-auto mt-8 max-w-4xl overflow-hidden">
-            <Image src={article.imageUrl} alt="" width={1200} height={675} className="w-full object-cover" priority />
+            <Image src={article.imageUrl} alt="" width={1200} height={675} unoptimized={isLocalMediaUrl(article.imageUrl)} className="w-full object-cover" priority />
           </figure>
         </Reveal>
       )}

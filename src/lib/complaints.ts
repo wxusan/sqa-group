@@ -14,6 +14,7 @@ import {
   WidthType,
 } from "docx";
 import { COMPANY_RECEIVER_EMAIL, sendCompanyEmail } from "@/lib/mail";
+import { logError, logWarn } from "@/lib/logger";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export type ComplaintState = { ok?: boolean; error?: string };
@@ -77,9 +78,10 @@ export async function submitComplaint(
   const documentBuffer = await buildComplaintDocx(data);
   const subject = `Yangi ${typeLabel.toLowerCase()}: ${data.subject} - ${data.applicantName}`;
 
-  await sendCompanyEmail({
-    subject,
-    text: [
+  try {
+    const mail = await sendCompanyEmail({
+      subject,
+      text: [
       `Sayt orqali yangi ${typeLabel.toLowerCase()} yuborildi.`,
       "",
       `Murojaat turi: ${typeLabel}`,
@@ -112,16 +114,24 @@ export async function submitComplaint(
       `Qabul qiluvchi: ${COMPANY_RECEIVER_EMAIL}`,
       "",
       "To'ldirilgan DOCX shakli ushbu xatga ilova qilingan.",
-    ].join("\n"),
-    html: buildComplaintHtml(data, typeLabel),
-    attachments: [
-      {
-        filename: `${data.submissionType}-${Date.now()}.docx`,
-        content: documentBuffer,
-        contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      },
-    ],
-  });
+      ].join("\n"),
+      html: buildComplaintHtml(data, typeLabel),
+      attachments: [
+        {
+          filename: `${data.submissionType}-${Date.now()}.docx`,
+          content: documentBuffer,
+          contentType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        },
+      ],
+    });
+    if (mail.skipped) {
+      logWarn("complaint.email_skipped", { submission_type: data.submissionType });
+      return { error: "delivery" };
+    }
+  } catch (error) {
+    logError("complaint.email_failed", error, { submission_type: data.submissionType });
+    return { error: "delivery" };
+  }
 
   return { ok: true };
 }

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
+import { isLocalMediaUrl } from "@/lib/media-url";
 
 export default function NewsCard({
   slug,
@@ -24,6 +25,7 @@ export default function NewsCard({
             src={imageUrl}
             alt=""
             fill
+            unoptimized={isLocalMediaUrl(imageUrl)}
             sizes="(max-width: 768px) 100vw, 33vw"
             className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
           />

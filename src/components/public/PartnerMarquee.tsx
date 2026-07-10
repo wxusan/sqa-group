@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { isLocalMediaUrl } from "@/lib/media-url";
 
 export type PartnerItem = { id: string; name: string; logoUrl: string; websiteUrl: string | null };
 
@@ -16,6 +17,7 @@ function Row({ partners, direction }: { partners: PartnerItem[]; direction: "lef
                 alt={p.name}
                 width={192}
                 height={96}
+                unoptimized={isLocalMediaUrl(p.logoUrl)}
                 className="max-h-14 w-auto max-w-full object-contain"
               />
             </div>

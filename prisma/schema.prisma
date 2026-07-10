@@ -11,7 +11,7 @@ model Staff {
   id           String             @id @default(cuid())
   slug         String             @unique
   photoUrl     String?
-  department   String             // certification | laboratory | management
+  department   String // certification | laboratory | management
   order        Int                @default(0)
   published    Boolean            @default(false)
   email        String?
@@ -20,6 +20,8 @@ model Staff {
   translations StaffTranslation[]
   createdAt    DateTime           @default(now())
   updatedAt    DateTime           @updatedAt
+
+  @@index([published, department, order])
 }
 
 model StaffTranslation {
@@ -46,6 +48,8 @@ model News {
   translations NewsTranslation[]
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
+
+  @@index([status, publishedAt])
 }
 
 model NewsTranslation {
@@ -68,6 +72,8 @@ model Partner {
   published    Boolean              @default(false)
   translations PartnerTranslation[]
   createdAt    DateTime             @default(now())
+
+  @@index([published, order])
 }
 
 model PartnerTranslation {
@@ -98,10 +104,14 @@ model Lead {
   status      String   @default("new") // new | processed
   locale      String   @default("uz")
   createdAt   DateTime @default(now())
+
+  @@index([status, createdAt])
 }
 
-/* Per-page visibility toggle controlled from the admin panel.
-   A missing row means the page is enabled (default on). */
+/**
+ * Per-page visibility toggle controlled from the admin panel.
+ * A missing row means the page is enabled (default on).
+ */
 model PageSetting {
   key       String   @id
   enabled   Boolean  @default(true)

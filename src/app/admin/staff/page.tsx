@@ -6,6 +6,7 @@ import { prisma } from "@/lib/prisma";
 import AdminShell from "@/components/admin/AdminShell";
 import LocaleBadges from "@/components/admin/LocaleBadges";
 import { deleteStaff } from "@/lib/actions";
+import { isLocalMediaUrl } from "@/lib/media-url";
 import { adminHref, adminMessages, getAdminLocale } from "@/i18n/admin";
 
 export const dynamic = "force-dynamic";
@@ -74,7 +75,7 @@ export default async function AdminStaffList({
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       {s.photoUrl ? (
-                        <Image src={s.photoUrl} alt="" width={36} height={36} className="h-9 w-9 rounded-card object-cover object-top" />
+                        <Image src={s.photoUrl} alt="" width={36} height={36} unoptimized={isLocalMediaUrl(s.photoUrl)} className="h-9 w-9 rounded-card object-cover object-top" />
                       ) : (
                         <span className="flex h-9 w-9 items-center justify-center rounded-card bg-band text-sm font-bold text-primary">{name.charAt(0)}</span>
                       )}

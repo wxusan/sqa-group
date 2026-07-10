@@ -1,12 +1,18 @@
 import { test, expect } from "@playwright/test";
+import {
+  ensureE2eAdmin,
+  E2E_ADMIN_EMAIL,
+  E2E_ADMIN_PASSWORD,
+  removeE2eAdmin,
+} from "./admin-test-helpers";
 
 test.describe("homepage", () => {
   test("renders all key sections on desktop", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto("/uz");
     await expect(page.locator("h1")).toContainText("ishonchli hamkoringiz");
-    await expect(page.getByText("O'ZAK.MS.0052").first()).toBeVisible();
-    await expect(page.getByText("O'ZAK.SL.0162").first()).toBeVisible();
+    await expect(page.getByText("O'ZAKK.MS.0052").first()).toBeVisible();
+    await expect(page.getByText("O'ZAKK.SL.0162").first()).toBeVisible();
     await expect(page.locator(".marquee-track--left")).toHaveCount(1);
     await expect(page.locator(".marquee-track--right")).toHaveCount(1);
   });
@@ -67,18 +73,21 @@ test.describe("language switcher", () => {
 });
 
 test.describe("admin protection", () => {
+  test.beforeAll(ensureE2eAdmin);
+  test.afterAll(removeE2eAdmin);
+
   test("redirects to login when logged out", async ({ page }) => {
     await page.goto("/admin");
     await expect(page).toHaveURL(/\/admin\/login/);
-    await expect(page.getByRole("button", { name: "Sign in" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /Kirish|Sign in/ })).toBeVisible();
   });
 
   test("admin login works with seeded credentials", async ({ page }) => {
     await page.goto("/admin/login");
-    await page.fill('input[name="email"]', "admin@sqa.uz");
-    await page.fill('input[name="password"]', "admin12345");
-    await page.getByRole("button", { name: "Sign in" }).click();
+    await page.fill('input[name="email"]', E2E_ADMIN_EMAIL);
+    await page.fill('input[name="password"]', E2E_ADMIN_PASSWORD);
+    await page.getByRole("button", { name: /Kirish|Sign in/ }).click();
     await expect(page).toHaveURL(/\/admin$/);
-    await expect(page.getByRole("heading", { name: "Dashboard" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Boshqaruv paneli|Dashboard/ })).toBeVisible();
   });
 });

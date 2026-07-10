@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { prisma } from "@/lib/prisma";
+import { isLocalMediaUrl } from "@/lib/media-url";
 import StaffCard from "@/components/public/StaffCard";
 import Reveal from "@/components/public/Reveal";
 
@@ -55,7 +56,7 @@ export default async function StaffDetailPage({ params }: { params: Promise<{ lo
           <figure className="card overflow-hidden">
             <div className="relative aspect-[4/5] bg-band">
               {member.photoUrl ? (
-                <Image src={member.photoUrl} alt={tr.name} fill sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover object-top" priority />
+                <Image src={member.photoUrl} alt={tr.name} fill unoptimized={isLocalMediaUrl(member.photoUrl)} sizes="(max-width: 1024px) 100vw, 40vw" className="object-cover object-top" priority />
               ) : (
                 <div className="flex h-full items-center justify-center text-7xl font-black text-primary/25">{tr.name.charAt(0)}</div>
               )}
